@@ -577,7 +577,7 @@
           &bull; rechtsonder: <strong>(400, 400)</strong><br>
           &bull; midden: <strong>(200, 200)</strong></p>
         <code class="sig">createCanvas(breedte, hoogte)</code>
-        <code>createCanvas(400, 400); <span class="c">maak een tekenblad van 400x400</span></code>
+        <code>createCanvas(400, 400); <span class="c">// maak een tekenblad van 400x400</span></code>
       </section>
 
       <section id="vormen">
@@ -594,19 +594,19 @@
           <text x="220" y="105" font-size="11" font-weight="700" fill="#2d3748" text-anchor="middle">square / rect</text>
         </svg>
         <code class="sig">circle(x, y, grootte)</code>
-        <code>circle(200, 200, 50); <span class="c">cirkel met midden op (200, 200), grootte 50</span></code>
+        <code>circle(200, 200, 50); <span class="c">// cirkel met midden op (200, 200), grootte 50</span></code>
         <code class="sig">ellipse(x, y, breedte, hoogte)</code>
-        <code>ellipse(200, 200, 80, 50); <span class="c">ovaal met midden op (200, 200), 80 breed, 50 hoog</span></code>
+        <code>ellipse(200, 200, 80, 50); <span class="c">// ovaal met midden op (200, 200), 80 breed, 50 hoog</span></code>
         <code class="sig">square(x, y, grootte)</code>
-        <code>square(100, 100, 50); <span class="c">vierkant met linkerbovenhoek op (100, 100), grootte 50</span></code>
+        <code>square(100, 100, 50); <span class="c">// vierkant met linkerbovenhoek op (100, 100), grootte 50</span></code>
         <code class="sig">rect(x, y, breedte, hoogte)</code>
-        <code>rect(100, 100, 80, 60); <span class="c">rechthoek linksboven (100, 100), 80 breed, 60 hoog</span></code>
+        <code>rect(100, 100, 80, 60); <span class="c">// rechthoek linksboven (100, 100), 80 breed, 60 hoog</span></code>
         <code class="sig">triangle(x1, y1, x2, y2, x3, y3)</code>
-        <code>triangle(200, 100, 150, 200, 250, 200); <span class="c">driehoek tussen drie punten</span></code>
+        <code>triangle(200, 100, 150, 200, 250, 200); <span class="c">// driehoek tussen drie punten</span></code>
         <code class="sig">line(x1, y1, x2, y2)</code>
-        <code>line(0, 0, 100, 100); <span class="c">lijn van (0, 0) naar (100, 100)</span></code>
+        <code>line(0, 0, 100, 100); <span class="c">// lijn van (0, 0) naar (100, 100)</span></code>
         <code class="sig">point(x, y)</code>
-        <code>point(50, 50); <span class="c">puntje op (50, 50)</span></code>
+        <code>point(50, 50); <span class="c">// puntje op (50, 50)</span></code>
         <div class="tip">Wat je later tekent, ligt bovenop wat je eerder tekende. Zet <strong>background()</strong> dus meestal als eerste in <strong>draw()</strong>.</div>
       </section>
 
@@ -614,29 +614,29 @@
         <h3>Kleuren</h3>
         <p class="about">Een kleur maak je met drie getallen: <strong>rood</strong>, <strong>groen</strong>, <strong>blauw</strong>. Elk getal gaat van 0 (niets) tot 255 (vol).</p>
         <code class="sig">fill(rood, groen, blauw)</code>
-        <code><span class="swatch" style="background:rgb(255,0,0)"></span>fill(255, 0, 0); <span class="c">vulkleur rood</span></code>
-        <code><span class="swatch" style="background:rgb(0,255,0)"></span>fill(0, 255, 0); <span class="c">vulkleur groen</span></code>
-        <code><span class="swatch" style="background:rgb(0,0,255)"></span>fill(0, 0, 255); <span class="c">vulkleur blauw</span></code>
-        <code><span class="swatch" style="background:rgb(255,255,0)"></span>fill(255, 255, 0); <span class="c">geel (rood + groen)</span></code>
-        <code><span class="swatch" style="background:rgb(255,255,255)"></span>fill(255, 255, 255); <span class="c">wit (alles vol)</span></code>
-        <code><span class="swatch" style="background:rgb(128,128,128)"></span>fill(128, 128, 128); <span class="c">grijs (alle drie gelijk)</span></code>
-        <code><span class="swatch" style="background:rgb(0,0,0)"></span>fill(0, 0, 0); <span class="c">zwart (alles 0)</span></code>
+        <code><span class="swatch" style="background:rgb(255,0,0)"></span>fill(255, 0, 0); <span class="c">// vulkleur rood</span></code>
+        <code><span class="swatch" style="background:rgb(0,255,0)"></span>fill(0, 255, 0); <span class="c">// vulkleur groen</span></code>
+        <code><span class="swatch" style="background:rgb(0,0,255)"></span>fill(0, 0, 255); <span class="c">// vulkleur blauw</span></code>
+        <code><span class="swatch" style="background:rgb(255,255,0)"></span>fill(255, 255, 0); <span class="c">// geel (rood + groen)</span></code>
+        <code><span class="swatch" style="background:rgb(255,255,255)"></span>fill(255, 255, 255); <span class="c">// wit (alles vol)</span></code>
+        <code><span class="swatch" style="background:rgb(128,128,128)"></span>fill(128, 128, 128); <span class="c">// grijs (alle drie gelijk)</span></code>
+        <code><span class="swatch" style="background:rgb(0,0,0)"></span>fill(0, 0, 0); <span class="c">// zwart (alles 0)</span></code>
         <code class="sig">background(rood, groen, blauw)</code>
-        <code><span class="swatch" style="background:rgb(220,220,220)"></span>background(220, 220, 220); <span class="c">grijze achtergrond</span></code>
-        <code>noFill(); <span class="c">geen vulling</span></code>
+        <code><span class="swatch" style="background:rgb(220,220,220)"></span>background(220, 220, 220); <span class="c">// grijze achtergrond</span></code>
+        <code>noFill(); <span class="c">// geen vulling</span></code>
         <code class="sig">stroke(rood, groen, blauw)</code>
-        <code><span class="swatch" style="background:rgb(0,0,255)"></span>stroke(0, 0, 255); <span class="c">lijnkleur blauw</span></code>
+        <code><span class="swatch" style="background:rgb(0,0,255)"></span>stroke(0, 0, 255); <span class="c">// lijnkleur blauw</span></code>
         <code class="sig">strokeWeight(dikte)</code>
-        <code>strokeWeight(5); <span class="c">lijndikte 5 pixels</span></code>
-        <code>noStroke(); <span class="c">geen rand/lijn</span></code>
+        <code>strokeWeight(5); <span class="c">// lijndikte 5 pixels</span></code>
+        <code>noStroke(); <span class="c">// geen rand/lijn</span></code>
       </section>
 
       <section id="tekst">
         <h3>Tekst</h3>
         <code class="sig">text(tekst, x, y)</code>
-        <code>text("Hallo!", 100, 100); <span class="c">tekst op positie (100, 100)</span></code>
+        <code>text("Hallo!", 100, 100); <span class="c">// tekst op positie (100, 100)</span></code>
         <code class="sig">textSize(grootte)</code>
-        <code>textSize(32); <span class="c">tekstgrootte</span></code>
+        <code>textSize(32); <span class="c">// tekstgrootte</span></code>
       </section>
 
       <section id="trucjes">
@@ -644,28 +644,28 @@
         <h4>Venster-afmetingen</h4>
         <p class="about">Met <strong>windowWidth</strong> en <strong>windowHeight</strong> krijg je de afmetingen van het browservenster. Handig om een canvas te maken dat het hele scherm vult.</p>
         <code class="sig">createCanvas(breedte, hoogte)</code>
-        <code>createCanvas(windowWidth, windowHeight); <span class="c">canvas zo groot als het venster</span></code>
+        <code>createCanvas(windowWidth, windowHeight); <span class="c">// canvas zo groot als het venster</span></code>
         <h4>Canvas-afmetingen</h4>
         <p class="about">In plaats van vaste getallen kun je ook <strong>width</strong> (breedte van je canvas) en <strong>height</strong> (hoogte) gebruiken. Handig als je iets altijd in het midden of op de rand wil hebben.</p>
         <code class="sig">circle(x, y, grootte)</code>
-        <code>circle(width/2, height/2, 50); <span class="c">cirkel precies in het midden</span></code>
-        <code>circle(width, height, 50); <span class="c">cirkel rechtsonder</span></code>
+        <code>circle(width/2, height/2, 50); <span class="c">// cirkel precies in het midden</span></code>
+        <code>circle(width, height, 50); <span class="c">// cirkel rechtsonder</span></code>
         <code class="sig">rect(x, y, breedte, hoogte)</code>
-        <code>rect(0, 0, width, height); <span class="c">rechthoek over het hele canvas</span></code>
+        <code>rect(0, 0, width, height); <span class="c">// rechthoek over het hele canvas</span></code>
         <h4>Muispositie</h4>
         <p class="about">Met <strong>mouseX</strong> en <strong>mouseY</strong> weet je waar de muis staat. Zet je tekening in <strong>draw()</strong> zodat het elk frame meebeweegt.</p>
-        <code>circle(mouseX, mouseY, 50); <span class="c">cirkel volgt de muis</span></code>
-        <code>line(0, 0, mouseX, mouseY); <span class="c">lijn van linksboven naar de muis</span></code>
+        <code>circle(mouseX, mouseY, 50); <span class="c">// cirkel volgt de muis</span></code>
+        <code>line(0, 0, mouseX, mouseY); <span class="c">// lijn van linksboven naar de muis</span></code>
         <h4>Willekeurig</h4>
         <p class="about">Met <strong>random()</strong> krijg je elke keer een ander getal. Handig voor verrassingen in je tekening.</p>
         <code class="sig">random(max)</code>
-        <code>random(100); <span class="c">willekeurig getal tussen 0 en 100</span></code>
+        <code>random(100); <span class="c">// willekeurig getal tussen 0 en 100</span></code>
         <code class="sig">random(min, max)</code>
-        <code>random(50, 150); <span class="c">willekeurig tussen 50 en 150</span></code>
+        <code>random(50, 150); <span class="c">// willekeurig tussen 50 en 150</span></code>
         <code class="sig">random()</code>
-        <code>random(); <span class="c">willekeurig getal tussen 0 en 1</span></code>
+        <code>random(); <span class="c">// willekeurig getal tussen 0 en 1</span></code>
         <code class="sig">random(lijst)</code>
-        <code>random(["rood", "groen", "blauw"]); <span class="c">willekeurig item uit een lijst</span></code>
+        <code>random(["rood", "groen", "blauw"]); <span class="c">// willekeurig item uit een lijst</span></code>
       </section>
 
       <section id="meer">
