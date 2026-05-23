@@ -1,1 +1,1 @@
-# p5js-editor
+# p5.js Editor
