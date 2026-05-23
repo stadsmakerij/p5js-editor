@@ -1,0 +1,917 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Teken Studio</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, system-ui, Helvetica, Arial, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      padding: 0;
+    }
+
+    .top-bar {
+      display: flex;
+      justify-content: flex-start;
+      align-items: center;
+      padding: 10px 20px;
+    }
+
+    .top-btn {
+      background: none;
+      border: none;
+      padding: 6px 10px;
+      cursor: pointer;
+      opacity: 0.85;
+      transition: all 0.2s;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: white;
+      font-family: -apple-system, system-ui, Helvetica, Arial, sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .top-btn:hover {
+      opacity: 1;
+      background: rgba(255,255,255,0.15);
+    }
+
+    .top-btn svg {
+      width: 18px;
+      height: 18px;
+      fill: white;
+    }
+
+    .main {
+      display: flex;
+      flex: 1;
+      padding: 0 20px 20px 20px;
+      gap: 20px;
+      overflow: hidden;
+    }
+
+    .panel {
+      background: #fff;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+      display: flex;
+      flex-direction: column;
+      width: 50%;
+    }
+
+    .panel-header {
+      background: #f7f7f7;
+      height: 48px;
+      padding: 0 16px;
+      font-size: 14px;
+      font-weight: 700;
+      color: #666;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    #runBtn {
+      background: #5a67d8;
+      color: white;
+      border: none;
+      padding: 6px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      font-family: -apple-system, system-ui, Helvetica, Arial, sans-serif;
+      font-weight: 700;
+      transition: background 0.2s;
+    }
+
+    #runBtn:hover {
+      background: #4c51bf;
+    }
+
+    /* Modal */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .modal-overlay.visible {
+      display: flex;
+    }
+
+    .modal {
+      background: white;
+      border-radius: 12px;
+      padding: 32px;
+      width: 100%;
+      max-width: 360px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    }
+
+    .modal h2 {
+      font-size: 20px;
+      color: #333;
+      margin-bottom: 20px;
+    }
+
+    .modal p {
+      color: #666;
+      font-size: 13px;
+      margin-bottom: 16px;
+      line-height: 1.5;
+    }
+
+    .modal-btn {
+      width: 100%;
+      padding: 12px;
+      background: #5a67d8;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 14px;
+      font-family: -apple-system, system-ui, Helvetica, Arial, sans-serif;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .modal-btn:hover {
+      background: #4c51bf;
+    }
+
+    .modal-btn.secondary {
+      background: #f0f0f0;
+      color: #666;
+    }
+
+    .modal-btn.secondary:hover {
+      background: #e0e0e0;
+    }
+
+    .modal-buttons {
+      display: flex;
+      gap: 10px;
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      background: none;
+      border: none;
+      font-size: 24px;
+      color: #999;
+      cursor: pointer;
+    }
+
+    .modal-close:hover {
+      color: #666;
+    }
+
+    .modal-wrapper {
+      position: relative;
+    }
+
+    .CodeMirror {
+      flex: 1;
+      height: auto !important;
+      font-size: 15px;
+      font-family: 'Monaco', 'Menlo', monospace;
+    }
+
+    .CodeMirror-gutters {
+      background: #fafafa;
+      border-right: none;
+    }
+
+    .CodeMirror-linenumber {
+      color: #bbb;
+    }
+
+    .preview-panel {
+      position: relative;
+    }
+
+    /* Tabs */
+    .tabs {
+      display: flex;
+      gap: 4px;
+    }
+
+    .tab {
+      background: none;
+      border: none;
+      padding: 6px 12px;
+      font-size: 13px;
+      font-family: -apple-system, system-ui, Helvetica, Arial, sans-serif;
+      font-weight: 700;
+      color: #999;
+      cursor: pointer;
+      border-radius: 6px;
+      transition: all 0.2s;
+    }
+
+    .tab:hover {
+      color: #666;
+    }
+
+    .tab.active {
+      background: #5a67d8;
+      color: white;
+    }
+
+    .tab.has-error {
+      color: #e53e3e;
+    }
+
+    .tab.has-error.active {
+      background: #e53e3e;
+      color: white;
+    }
+
+    .error-badge {
+      background: #e53e3e;
+      color: white;
+      font-size: 10px;
+      padding: 1px 5px;
+      border-radius: 8px;
+      margin-left: 4px;
+    }
+
+    .tab.active .error-badge {
+      background: white;
+      color: #e53e3e;
+    }
+
+    /* Content areas */
+    #preview {
+      flex: 1;
+      background: #fff;
+      border: none;
+    }
+
+    #preview.hidden {
+      display: none;
+    }
+
+    #console {
+      flex: 1;
+      display: none;
+      overflow-y: auto;
+      padding: 12px 16px;
+      font-family: 'Monaco', 'Menlo', monospace;
+      font-size: 13px;
+      background: #fafafa;
+    }
+
+    #console.visible {
+      display: block;
+    }
+
+    .console-line {
+      padding: 3px 0;
+    }
+
+    .console-line.error {
+      color: #e53e3e;
+    }
+
+    .console-line.warn {
+      color: #d69e2e;
+    }
+
+    #help {
+      flex: 1;
+      display: none;
+      overflow-y: auto;
+      padding: 20px;
+      font-size: 13px;
+      background: linear-gradient(180deg, #f0f4ff 0%, #fff 100%);
+    }
+
+    #help.visible {
+      display: block;
+    }
+
+    #help .intro {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 16px;
+    }
+
+    #help .intro p {
+      margin: 0 0 8px 0;
+      line-height: 1.5;
+      font-size: 13px;
+    }
+
+    #help .intro p:last-child {
+      margin-bottom: 0;
+    }
+
+    #help .intro strong {
+      color: #ffd700;
+    }
+
+    #help .intro em {
+      color: #a5d6ff;
+      font-style: normal;
+    }
+
+    #help .nav {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 16px;
+    }
+
+    #help .nav a {
+      background: #fff;
+      color: #5a67d8;
+      padding: 5px 10px;
+      border-radius: 16px;
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 11px;
+      border: 1px solid #e0e0ff;
+      transition: all 0.2s;
+    }
+
+    #help .nav a:hover {
+      background: #5a67d8;
+      color: white;
+    }
+
+    #help h3 {
+      font-size: 13px;
+      color: #5a67d8;
+      margin: 20px 0 10px 0;
+      padding-bottom: 4px;
+      border-bottom: 2px solid #e0e0ff;
+    }
+
+    #help section:first-of-type h3 {
+      margin-top: 0;
+    }
+
+    #help h4 {
+      font-size: 12px;
+      color: #2d3748;
+      margin: 16px 0 6px 0;
+      font-weight: 700;
+    }
+
+    #help .tip {
+      background: #fffbeb;
+      border-left: 3px solid #f59e0b;
+      padding: 8px 12px;
+      margin: 10px 0;
+      border-radius: 0 8px 8px 0;
+      font-size: 12px;
+      color: #92400e;
+    }
+
+    #help code {
+      display: block;
+      font-family: 'Monaco', 'Menlo', monospace;
+      font-size: 12px;
+      padding: 8px 12px;
+      margin: 6px 0;
+      background: #fff;
+      border-radius: 8px;
+      border: 1px solid #eee;
+    }
+
+    #help code:hover {
+      border-color: #c7d2fe;
+    }
+
+    #help code.sig {
+      background: transparent;
+      border: none;
+      color: #5a67d8;
+      padding: 4px 4px 0;
+      margin: 10px 0 0;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    #help code.sig + code {
+      margin-top: 2px;
+    }
+
+    #help code .c {
+      color: #999;
+      font-size: 11px;
+    }
+
+    #help .swatch {
+      display: inline-block;
+      width: 14px;
+      height: 14px;
+      border-radius: 3px;
+      border: 1px solid #ddd;
+      vertical-align: middle;
+      margin-right: 6px;
+    }
+
+    #help .about {
+      color: #666;
+      font-size: 12px;
+      line-height: 1.6;
+      margin: 8px 0;
+    }
+
+    #help .about a {
+      color: #5a67d8;
+    }
+
+    #help .canvas-diagram {
+      display: block;
+      margin: 12px auto;
+      max-width: 220px;
+      width: 100%;
+    }
+  </style>
+</head>
+<body>
+  <div class="top-bar">
+    <button class="top-btn" id="resetBtn" title="Opnieuw beginnen">
+      <svg viewBox="0 0 24 24"><path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>
+      Opnieuw
+    </button>
+    <button class="top-btn" id="downloadBtn" title="Download als bestand">
+      <svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+      Download
+    </button>
+    <button class="top-btn" id="openBtn" title="Open bestand">
+      <svg viewBox="0 0 24 24"><path d="M9 16h6v-6h4l-7-7-7 7h4zm-4 2h14v2H5z"/></svg>
+      Open
+    </button>
+    <input type="file" id="fileInput" accept=".js,.txt" style="display:none">
+  </div>
+
+  <!-- Confirm Modal (generic) -->
+  <div class="modal-overlay" id="confirmModal">
+    <div class="modal-wrapper">
+      <div class="modal">
+        <h2 id="confirmTitle"></h2>
+        <p id="confirmBody"></p>
+        <div class="modal-buttons">
+          <button class="modal-btn secondary" id="confirmCancel">Annuleer</button>
+          <button class="modal-btn" id="confirmOk"></button>
+        </div>
+      </div>
+      <button class="modal-close" id="confirmClose">&times;</button>
+    </div>
+  </div>
+
+  <div class="main">
+    <div class="panel editor-panel">
+    <div class="panel-header">
+      <span>Code</span>
+      <button id="runBtn">Start</button>
+    </div>
+    <textarea id="code"></textarea>
+  </div>
+
+  <div class="panel preview-panel">
+    <div class="panel-header">
+      <span>Resultaat</span>
+      <div class="tabs">
+        <button class="tab active" id="tabCanvas">Canvas</button>
+        <button class="tab" id="tabLog">Log</button>
+        <button class="tab" id="tabHelp">Help</button>
+      </div>
+    </div>
+    <iframe id="preview"></iframe>
+    <div id="console"></div>
+    <div id="help">
+      <div class="intro">
+        <p>Programmeren met <strong>p5.js</strong></p>
+      </div>
+
+      <div class="nav">
+        <a href="#basis">Basis</a>
+        <a href="#vormen">Vormen</a>
+        <a href="#kleuren">Kleuren</a>
+        <a href="#tekst">Tekst</a>
+        <a href="#trucjes">Slimme trucjes</a>
+        <a href="#meer">Meer</a>
+      </div>
+
+      <section id="basis">
+        <h3>Basis</h3>
+        <p class="about">Elk programma heeft twee blokken: <strong>setup()</strong> draait 1x zodra je start, <strong>draw()</strong> herhaalt zichzelf 60 keer per seconde.</p>
+        <p class="about">Het <strong>canvas</strong> is je tekenblad &mdash; een leeg vel waar alles op verschijnt wat je tekent. Je maakt het aan in <strong>setup()</strong>.</p>
+        <p class="about">Waar iets komt bepaal je met twee getallen: <strong>x</strong> is hoe ver van links, <strong>y</strong> is hoe ver van boven. Hoe groter het getal, hoe verder naar rechts (x) of naar beneden (y).</p>
+        <svg class="canvas-diagram" viewBox="0 0 280 280" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+              <path d="M0,0 L10,5 L0,10 z" fill="#2d3748"/>
+            </marker>
+          </defs>
+          <line x1="40" y1="25" x2="235" y2="25" stroke="#2d3748" stroke-width="1.5" marker-end="url(#arrow)"/>
+          <text x="140" y="19" font-size="12" font-weight="700" fill="#2d3748" text-anchor="middle">x</text>
+          <line x1="25" y1="40" x2="25" y2="235" stroke="#2d3748" stroke-width="1.5" marker-end="url(#arrow)"/>
+          <text x="19" y="144" font-size="12" font-weight="700" fill="#2d3748" text-anchor="middle">y</text>
+          <rect x="40" y="40" width="200" height="200" fill="#fff" stroke="#5a67d8" stroke-width="2" rx="4"/>
+          <circle cx="40" cy="40" r="4" fill="#5a67d8"/>
+          <text x="50" y="58" font-size="11" font-weight="700" fill="#5a67d8">(0, 0)</text>
+          <circle cx="240" cy="40" r="4" fill="#5a67d8"/>
+          <text x="230" y="58" font-size="11" font-weight="700" fill="#5a67d8" text-anchor="end">(400, 0)</text>
+          <circle cx="40" cy="240" r="4" fill="#5a67d8"/>
+          <text x="50" y="232" font-size="11" font-weight="700" fill="#5a67d8">(0, 400)</text>
+          <circle cx="240" cy="240" r="4" fill="#5a67d8"/>
+          <text x="230" y="232" font-size="11" font-weight="700" fill="#5a67d8" text-anchor="end">(400, 400)</text>
+          <circle cx="140" cy="140" r="4" fill="#e53e3e"/>
+          <text x="148" y="144" font-size="11" font-weight="700" fill="#e53e3e">(200, 200)</text>
+        </svg>
+        <p class="about">Dus op een canvas van 400×400:</p>
+        <p class="about">&bull; linksboven: <strong>(0, 0)</strong><br>
+          &bull; rechtsboven: <strong>(400, 0)</strong><br>
+          &bull; linksonder: <strong>(0, 400)</strong><br>
+          &bull; rechtsonder: <strong>(400, 400)</strong><br>
+          &bull; midden: <strong>(200, 200)</strong></p>
+        <code class="sig">createCanvas(breedte, hoogte)</code>
+        <code>createCanvas(400, 400); <span class="c">maak een tekenblad van 400x400</span></code>
+      </section>
+
+      <section id="vormen">
+        <h3>Vormen</h3>
+        <p class="about">Let op: bij <strong>circle</strong> en <strong>ellipse</strong> is (x, y) het <em>midden</em>. Bij <strong>square</strong> en <strong>rect</strong> is (x, y) de <em>linkerbovenhoek</em>. Bij <strong>triangle</strong> geef je drie aparte punten.</p>
+        <svg class="canvas-diagram" viewBox="0 0 280 110" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="60" cy="55" r="35" fill="none" stroke="#5a67d8" stroke-width="2"/>
+          <circle cx="60" cy="55" r="3.5" fill="#e53e3e"/>
+          <text x="68" y="59" font-size="11" font-weight="700" fill="#e53e3e">(x, y)</text>
+          <text x="60" y="105" font-size="11" font-weight="700" fill="#2d3748" text-anchor="middle">circle</text>
+          <rect x="185" y="25" width="70" height="60" fill="none" stroke="#5a67d8" stroke-width="2"/>
+          <circle cx="185" cy="25" r="3.5" fill="#e53e3e"/>
+          <text x="192" y="22" font-size="11" font-weight="700" fill="#e53e3e">(x, y)</text>
+          <text x="220" y="105" font-size="11" font-weight="700" fill="#2d3748" text-anchor="middle">square / rect</text>
+        </svg>
+        <code class="sig">circle(x, y, grootte)</code>
+        <code>circle(200, 200, 50); <span class="c">cirkel met midden op (200, 200), grootte 50</span></code>
+        <code class="sig">ellipse(x, y, breedte, hoogte)</code>
+        <code>ellipse(200, 200, 80, 50); <span class="c">ovaal met midden op (200, 200), 80 breed, 50 hoog</span></code>
+        <code class="sig">square(x, y, grootte)</code>
+        <code>square(100, 100, 50); <span class="c">vierkant met linkerbovenhoek op (100, 100), grootte 50</span></code>
+        <code class="sig">rect(x, y, breedte, hoogte)</code>
+        <code>rect(100, 100, 80, 60); <span class="c">rechthoek linksboven (100, 100), 80 breed, 60 hoog</span></code>
+        <code class="sig">triangle(x1, y1, x2, y2, x3, y3)</code>
+        <code>triangle(200, 100, 150, 200, 250, 200); <span class="c">driehoek tussen drie punten</span></code>
+        <code class="sig">line(x1, y1, x2, y2)</code>
+        <code>line(0, 0, 100, 100); <span class="c">lijn van (0, 0) naar (100, 100)</span></code>
+        <code class="sig">point(x, y)</code>
+        <code>point(50, 50); <span class="c">puntje op (50, 50)</span></code>
+        <div class="tip">Wat je later tekent, ligt bovenop wat je eerder tekende. Zet <strong>background()</strong> dus meestal als eerste in <strong>draw()</strong>.</div>
+      </section>
+
+      <section id="kleuren">
+        <h3>Kleuren</h3>
+        <p class="about">Een kleur maak je met drie getallen: <strong>rood</strong>, <strong>groen</strong>, <strong>blauw</strong>. Elk getal gaat van 0 (niets) tot 255 (vol).</p>
+        <code class="sig">fill(rood, groen, blauw)</code>
+        <code><span class="swatch" style="background:rgb(255,0,0)"></span>fill(255, 0, 0); <span class="c">vulkleur rood</span></code>
+        <code><span class="swatch" style="background:rgb(0,255,0)"></span>fill(0, 255, 0); <span class="c">vulkleur groen</span></code>
+        <code><span class="swatch" style="background:rgb(0,0,255)"></span>fill(0, 0, 255); <span class="c">vulkleur blauw</span></code>
+        <code><span class="swatch" style="background:rgb(255,255,0)"></span>fill(255, 255, 0); <span class="c">geel (rood + groen)</span></code>
+        <code><span class="swatch" style="background:rgb(255,255,255)"></span>fill(255, 255, 255); <span class="c">wit (alles vol)</span></code>
+        <code><span class="swatch" style="background:rgb(128,128,128)"></span>fill(128, 128, 128); <span class="c">grijs (alle drie gelijk)</span></code>
+        <code><span class="swatch" style="background:rgb(0,0,0)"></span>fill(0, 0, 0); <span class="c">zwart (alles 0)</span></code>
+        <code class="sig">background(rood, groen, blauw)</code>
+        <code><span class="swatch" style="background:rgb(220,220,220)"></span>background(220, 220, 220); <span class="c">grijze achtergrond</span></code>
+        <code>noFill(); <span class="c">geen vulling</span></code>
+        <code class="sig">stroke(rood, groen, blauw)</code>
+        <code><span class="swatch" style="background:rgb(0,0,255)"></span>stroke(0, 0, 255); <span class="c">lijnkleur blauw</span></code>
+        <code class="sig">strokeWeight(dikte)</code>
+        <code>strokeWeight(5); <span class="c">lijndikte 5 pixels</span></code>
+        <code>noStroke(); <span class="c">geen rand/lijn</span></code>
+      </section>
+
+      <section id="tekst">
+        <h3>Tekst</h3>
+        <code class="sig">text(tekst, x, y)</code>
+        <code>text("Hallo!", 100, 100); <span class="c">tekst op positie (100, 100)</span></code>
+        <code class="sig">textSize(grootte)</code>
+        <code>textSize(32); <span class="c">tekstgrootte</span></code>
+      </section>
+
+      <section id="trucjes">
+        <h3>Slimme trucjes</h3>
+        <h4>Venster-afmetingen</h4>
+        <p class="about">Met <strong>windowWidth</strong> en <strong>windowHeight</strong> krijg je de afmetingen van het browservenster. Handig om een canvas te maken dat het hele scherm vult.</p>
+        <code class="sig">createCanvas(breedte, hoogte)</code>
+        <code>createCanvas(windowWidth, windowHeight); <span class="c">canvas zo groot als het venster</span></code>
+        <h4>Canvas-afmetingen</h4>
+        <p class="about">In plaats van vaste getallen kun je ook <strong>width</strong> (breedte van je canvas) en <strong>height</strong> (hoogte) gebruiken. Handig als je iets altijd in het midden of op de rand wil hebben.</p>
+        <code class="sig">circle(x, y, grootte)</code>
+        <code>circle(width/2, height/2, 50); <span class="c">cirkel precies in het midden</span></code>
+        <code>circle(width, height, 50); <span class="c">cirkel rechtsonder</span></code>
+        <code class="sig">rect(x, y, breedte, hoogte)</code>
+        <code>rect(0, 0, width, height); <span class="c">rechthoek over het hele canvas</span></code>
+        <h4>Muispositie</h4>
+        <p class="about">Met <strong>mouseX</strong> en <strong>mouseY</strong> weet je waar de muis staat. Zet je tekening in <strong>draw()</strong> zodat het elk frame meebeweegt.</p>
+        <code>circle(mouseX, mouseY, 50); <span class="c">cirkel volgt de muis</span></code>
+        <code>line(0, 0, mouseX, mouseY); <span class="c">lijn van linksboven naar de muis</span></code>
+        <h4>Willekeurig</h4>
+        <p class="about">Met <strong>random()</strong> krijg je elke keer een ander getal. Handig voor verrassingen in je tekening.</p>
+        <code class="sig">random(max)</code>
+        <code>random(100); <span class="c">willekeurig getal tussen 0 en 100</span></code>
+        <code class="sig">random(min, max)</code>
+        <code>random(50, 150); <span class="c">willekeurig tussen 50 en 150</span></code>
+        <code class="sig">random()</code>
+        <code>random(); <span class="c">willekeurig getal tussen 0 en 1</span></code>
+        <code class="sig">random(lijst)</code>
+        <code>random(["rood", "groen", "blauw"]); <span class="c">willekeurig item uit een lijst</span></code>
+      </section>
+
+      <section id="meer">
+        <h3>Meer</h3>
+        <p class="about">Er zijn nog veel meer functies! Bekijk de volledige referentie (Engels) op <a href="https://p5js.org/reference/" target="_blank">p5js.org/reference</a>.</p>
+      </section>
+    </div>
+  </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/javascript/javascript.min.js"></script>
+  <script>
+    const DEFAULT_CODE = `function setup() {
+  createCanvas(400, 400);
+}
+
+function draw() {
+}`;
+    const STORAGE_KEY = 'tekenstudio_code';
+
+    const codeTextarea = document.getElementById('code');
+    const savedCode = localStorage.getItem(STORAGE_KEY);
+    codeTextarea.value = savedCode !== null ? savedCode : DEFAULT_CODE;
+
+    const editor = CodeMirror.fromTextArea(codeTextarea, {
+      mode: 'javascript',
+      lineNumbers: true,
+      tabSize: 2,
+      indentWithTabs: false,
+      lineWrapping: true
+    });
+
+    editor.on('change', () => {
+      localStorage.setItem(STORAGE_KEY, editor.getValue());
+    });
+
+    const preview = document.getElementById('preview');
+    const runBtn = document.getElementById('runBtn');
+    const consoleEl = document.getElementById('console');
+    const tabCanvas = document.getElementById('tabCanvas');
+    const tabLog = document.getElementById('tabLog');
+    const tabHelp = document.getElementById('tabHelp');
+    const helpEl = document.getElementById('help');
+
+    let errorCount = 0;
+
+    function showTab(tab) {
+      tabCanvas.classList.remove('active');
+      tabLog.classList.remove('active');
+      tabHelp.classList.remove('active');
+      preview.classList.add('hidden');
+      consoleEl.classList.remove('visible');
+      helpEl.classList.remove('visible');
+
+      if (tab === 'canvas') {
+        tabCanvas.classList.add('active');
+        preview.classList.remove('hidden');
+      } else if (tab === 'log') {
+        tabLog.classList.add('active');
+        consoleEl.classList.add('visible');
+      } else if (tab === 'help') {
+        tabHelp.classList.add('active');
+        helpEl.classList.add('visible');
+      }
+    }
+
+    tabCanvas.addEventListener('click', () => showTab('canvas'));
+    tabLog.addEventListener('click', () => showTab('log'));
+    tabHelp.addEventListener('click', () => showTab('help'));
+
+    function addToConsole(msg, type = 'log') {
+      const line = document.createElement('div');
+      line.className = 'console-line ' + type;
+      line.textContent = msg;
+      consoleEl.appendChild(line);
+      consoleEl.scrollTop = consoleEl.scrollHeight;
+
+      if (type === 'error') {
+        errorCount++;
+        tabLog.classList.add('has-error');
+        tabLog.innerHTML = 'Log <span class="error-badge">' + errorCount + '</span>';
+      }
+    }
+
+    window.addEventListener('message', (e) => {
+      if (e.data && e.data.type === 'console') {
+        addToConsole(e.data.msg, e.data.level);
+      }
+    });
+
+    function runCode() {
+      consoleEl.innerHTML = '';
+      errorCount = 0;
+      tabLog.classList.remove('has-error');
+      tabLog.textContent = 'Log';
+      showTab('canvas');
+
+      const code = editor.getValue();
+      const beforeCode = `<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    body { margin: 0; overflow: hidden; display: flex; justify-content: center; align-items: center; min-height: 100vh; background: #fff; }
+    canvas { display: block; }
+  </style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js"><\/script>
+  <script>
+    const LINE_OFFSET = `;
+      const afterOffset = `;
+    ['log', 'warn', 'error'].forEach(level => {
+      const orig = console[level];
+      console[level] = function(...args) {
+        parent.postMessage({ type: 'console', level, msg: args.map(a => typeof a === 'object' ? JSON.stringify(a) : String(a)).join(' ') }, '*');
+        orig.apply(console, args);
+      };
+    });
+    window.onerror = function(msg, url, line, col) {
+      const corrected = line ? line - LINE_OFFSET : null;
+      const lineInfo = corrected ? ' (regel ' + corrected + ')' : '';
+      parent.postMessage({ type: 'console', level: 'error', msg: msg + lineInfo }, '*');
+    };
+  <\/script>
+</head>
+<body>
+  <script>`;
+      const afterCode = `<\/script>
+</body>
+</html>`;
+      const lineOffset = (beforeCode + afterOffset).split('\n').length;
+      const html = beforeCode + lineOffset + afterOffset + code + afterCode;
+      preview.srcdoc = html;
+    }
+
+    runBtn.addEventListener('click', runCode);
+
+    editor.setOption('extraKeys', {
+      'Cmd-Enter': runCode,
+      'Ctrl-Enter': runCode
+    });
+
+    runCode();
+
+    // Generic confirm modal
+    const confirmModal = document.getElementById('confirmModal');
+    const confirmTitle = document.getElementById('confirmTitle');
+    const confirmBody = document.getElementById('confirmBody');
+    const confirmOk = document.getElementById('confirmOk');
+    const confirmCancel = document.getElementById('confirmCancel');
+    const confirmClose = document.getElementById('confirmClose');
+    let confirmCallback = null;
+
+    function openConfirm({ title, body, okLabel, onOk }) {
+      confirmTitle.textContent = title;
+      confirmBody.textContent = body;
+      confirmOk.textContent = okLabel;
+      confirmCallback = onOk;
+      confirmModal.classList.add('visible');
+    }
+
+    function closeConfirm() {
+      confirmModal.classList.remove('visible');
+      confirmCallback = null;
+    }
+
+    confirmOk.addEventListener('click', () => {
+      const cb = confirmCallback;
+      closeConfirm();
+      if (cb) cb();
+    });
+    confirmCancel.addEventListener('click', closeConfirm);
+    confirmClose.addEventListener('click', closeConfirm);
+    confirmModal.addEventListener('click', (e) => {
+      if (e.target === confirmModal) closeConfirm();
+    });
+
+    function hasChanges() {
+      return editor.getValue() !== DEFAULT_CODE;
+    }
+
+    // Reset
+    const resetBtn = document.getElementById('resetBtn');
+
+    function resetProject() {
+      editor.setValue(DEFAULT_CODE);
+      localStorage.removeItem(STORAGE_KEY);
+      runCode();
+    }
+
+    resetBtn.addEventListener('click', () => {
+      if (hasChanges()) {
+        openConfirm({
+          title: 'Opnieuw beginnen?',
+          body: 'Je huidige code gaat verloren. Wil je het bewaren? Klik dan eerst op Download.',
+          okLabel: 'Opnieuw',
+          onOk: resetProject
+        });
+      } else {
+        resetProject();
+      }
+    });
+
+    // Download
+    document.getElementById('downloadBtn').addEventListener('click', () => {
+      const code = editor.getValue();
+      const ts = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
+      const blob = new Blob([code], { type: 'text/javascript' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `tekenstudio-${ts}.js`;
+      a.click();
+      URL.revokeObjectURL(url);
+    });
+
+    // Open / Import
+    const openBtn = document.getElementById('openBtn');
+    const fileInput = document.getElementById('fileInput');
+
+    function applyImportedCode(text) {
+      editor.setValue(text);
+      runCode();
+    }
+
+    function handleImportedText(text) {
+      if (hasChanges()) {
+        openConfirm({
+          title: 'Bestand openen?',
+          body: 'Dit vervangt je huidige code.',
+          okLabel: 'Openen',
+          onOk: () => applyImportedCode(text)
+        });
+      } else {
+        applyImportedCode(text);
+      }
+    }
+
+    openBtn.addEventListener('click', () => fileInput.click());
+
+    fileInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (ev) => handleImportedText(ev.target.result);
+      reader.readAsText(file);
+      e.target.value = '';
+    });
+
+    // Drag-drop import (capture phase so CodeMirror doesn't steal the drop)
+    window.addEventListener('dragover', (e) => {
+      if (e.dataTransfer && e.dataTransfer.types && e.dataTransfer.types.includes('Files')) {
+        e.preventDefault();
+      }
+    }, true);
+
+    window.addEventListener('drop', (e) => {
+      if (!e.dataTransfer || !e.dataTransfer.files || !e.dataTransfer.files.length) return;
+      e.preventDefault();
+      e.stopPropagation();
+      const file = e.dataTransfer.files[0];
+      const reader = new FileReader();
+      reader.onload = (ev) => handleImportedText(ev.target.result);
+      reader.readAsText(file);
+    }, true);
+  </script>
+</body>
+</html>
